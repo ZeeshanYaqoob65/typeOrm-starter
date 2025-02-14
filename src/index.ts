@@ -3,6 +3,7 @@ import express from 'express';
 // import cors from 'cors';
 import { AppDataSource } from './data-source';
 import userRoutes from './routes/userRoutes';
+import companyRoutes from './routes/companyRoutes';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use('/users', userRoutes);
+app.use('/company', companyRoutes);
 
 // Start Server After Database Connection
 AppDataSource.initialize()
