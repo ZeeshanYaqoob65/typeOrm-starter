@@ -3,6 +3,8 @@ import {
   createAppointment,
   updateAppointmentStatus,
   getAppointmentsByDate,
+  getAppointments,
+  getAppointmentById,
 } from '../repositories/appointmentRepository';
 import {
   successResponse,
@@ -69,5 +71,34 @@ export const getAppointmentsByDateHandler: RequestHandler = async (
     successResponse(res, appointments);
   } catch (error) {
     errorResponse(res);
+  }
+};
+
+export const getAppointmentsHandler: RequestHandler = async (req, res) => {
+  try {
+    const { date, walkerId, ownerId, companyId } = req.query;
+
+    const appointments = await getAppointments(
+      date as string,
+      walkerId ? Number(walkerId) : undefined,
+      ownerId ? Number(ownerId) : undefined,
+      companyId ? Number(companyId) : undefined
+    );
+
+    successResponse(res, appointments);
+  } catch (error) {
+    errorResponse(res, 'Failed to fetch appointments');
+  }
+};
+
+export const getAppointmentByIdHandler: RequestHandler = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return errorResponse(res, 'Invalid appointment ID', 400);
+
+    const appointment = await getAppointmentById(id);
+    appointment ? successResponse(res, appointment) : notFoundResponse(res);
+  } catch (error) {
+    errorResponse(res, 'Failed to fetch appointment');
   }
 };

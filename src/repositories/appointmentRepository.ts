@@ -66,3 +66,38 @@ export const getAppointmentsByDate = async (date: string) => {
     where: { date },
   });
 };
+
+export const getAppointments = async (
+  date?: string,
+  walkerId?: number,
+  ownerId?: number,
+  companyId?: number
+) => {
+  const query = appointmentRepository
+    .createQueryBuilder('appointment')
+    .leftJoinAndSelect('appointment.dog', 'dog')
+    .leftJoinAndSelect('dog.owner', 'owner')
+    .leftJoinAndSelect('dog.walker', 'walker');
+
+  if (date) {
+    query.andWhere('appointment.date = :date', { date });
+  }
+  if (walkerId) {
+    query.andWhere('dog.walkerId = :walkerId', { walkerId });
+  }
+  if (ownerId) {
+    query.andWhere('dog.ownerId = :ownerId', { ownerId });
+  }
+  if (companyId) {
+    query.andWhere('owner.companyId = :companyId', { companyId });
+  }
+
+  return await query.getMany();
+};
+
+export const getAppointmentById = async (id: number) => {
+  return await appointmentRepository.findOne({
+    where: { id },
+    relations: ['dog', 'dog.owner', 'dog.walker'],
+  });
+};
